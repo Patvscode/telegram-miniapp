@@ -1,26 +1,707 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>OpenClaw Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenClaw Control Panel</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --wallpaper-top: #c8d5ff;
+      --wallpaper-mid: #f6f1ff;
+      --wallpaper-bottom: #e3eefc;
+      --glass: rgba(255, 255, 255, 0.72);
+      --glass-strong: rgba(255, 255, 255, 0.9);
+      --border: rgba(60, 60, 67, 0.16);
+      --shadow: 0 30px 80px rgba(0, 0, 0, 0.24);
+      --title: #1d1d1f;
+      --subtitle: #6e6e73;
+      --accent: #007aff;
+      --accent-soft: rgba(0, 122, 255, 0.14);
+      --success: #34c759;
+      --warning: #ff9f0a;
+      --danger: #ff453a;
+      --dock: rgba(255, 255, 255, 0.6);
+      --menu: rgba(255, 255, 255, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+        "Segoe UI", sans-serif;
+      color: var(--title);
+      background: radial-gradient(circle at 20% 0%, var(--wallpaper-top), var(--wallpaper-mid) 45%, var(--wallpaper-bottom) 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .menu-bar {
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      font-size: 13px;
+      color: #1c1c1e;
+      background: var(--menu);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .menu-left,
+    .menu-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .menu-icon {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .desktop {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 18px 96px;
+    }
+
+    .window {
+      width: min(1120px, 100%);
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(30px);
+      overflow: hidden;
+    }
+
+    .titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.7));
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .toolbar .search {
+      flex: 1;
+      max-width: 320px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 13px;
+      color: var(--subtitle);
+    }
+
+    .toolbar .search input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      width: 100%;
+      color: var(--title);
+    }
+
+    .segmented {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border);
+      padding: 4px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    .segmented button {
+      border: none;
+      background: transparent;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--subtitle);
+    }
+
+    .segmented button.active {
+      background: #fff;
+      color: var(--title);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      font-weight: 600;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 8px;
+    }
+
+    .traffic-lights span {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.2);
+    }
+
+    .traffic-lights .red {
+      background: var(--danger);
+    }
+
+    .traffic-lights .yellow {
+      background: var(--warning);
+    }
+
+    .traffic-lights .green {
+      background: var(--success);
+    }
+
+    .titlebar-title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      text-align: center;
+    }
+
+    .titlebar-title span {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .titlebar-title small {
+      font-size: 11px;
+      color: var(--subtitle);
+    }
+
+    .titlebar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--subtitle);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 560px;
+    }
+
+    .sidebar {
+      padding: 22px 20px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .app-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .app-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #7aa3ff, #4f6df6);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .app-meta h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .app-meta p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: var(--subtitle);
+    }
+
+    .nav-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav-group h3 {
+      margin: 0;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--subtitle);
+    }
+
+    .nav-group button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      color: var(--title);
+      cursor: pointer;
+    }
+
+    .nav-group button.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .nav-group button span {
+      font-size: 11px;
+      color: var(--subtitle);
+    }
+
+    .main {
+      padding: 28px 32px 32px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 32px);
+      font-weight: 600;
+    }
+
+    .hero p {
+      margin: 6px 0 0;
+      font-size: 14px;
+      color: var(--subtitle);
+    }
+
+    .status-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--glass-strong);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .card h4 {
+      margin: 0;
+      font-size: 12px;
+      color: var(--subtitle);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .toggle {
+      width: 46px;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(120, 120, 128, 0.2);
+      position: relative;
+      transition: background 0.2s ease;
+    }
+
+    .toggle::after {
+      content: "";
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    .toggle.on {
+      background: var(--accent);
+    }
+
+    .toggle.on::after {
+      transform: translateX(20px);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .actions button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .actions .primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 12px 30px rgba(0, 122, 255, 0.3);
+    }
+
+    .actions .secondary {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--title);
+    }
+
+    .actions button:active {
+      transform: translateY(1px);
+    }
+
+    .footer {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--subtitle);
+    }
+
+    .activity {
+      display: grid;
+      gap: 12px;
+    }
+
+    .activity h3 {
+      margin: 0;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--subtitle);
+    }
+
+    .activity-item {
+      display: grid;
+      gap: 6px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.85);
+      font-size: 13px;
+    }
+
+    .activity-item strong {
+      font-size: 14px;
+      color: var(--title);
+    }
+
+    .dock {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: var(--dock);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 22px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+      z-index: 4;
+    }
+
+    .dock-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: #ffffff;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    @media (max-width: 880px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .dock {
+        display: none;
+      }
+
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+<body>
+  <div class="menu-bar">
+    <div class="menu-left">
+      <span class="menu-icon"></span>
+      <span>OpenClaw</span>
+      <span>File</span>
+      <span>Edit</span>
+      <span>View</span>
+      <span>Window</span>
+    </div>
+    <div class="menu-right">
+      <span>Wi-Fi</span>
+      <span>Battery</span>
+      <span>9:41 AM</span>
+    </div>
+  </div>
 
-<body style="font-family: Arial; text-align:center; margin-top:40px;">
-<h2>OpenClaw Control Panel</h2>
+  <div class="desktop">
+    <section class="window" aria-label="OpenClaw System Settings">
+      <header class="titlebar">
+        <div class="traffic-lights" aria-hidden="true">
+          <span class="red"></span>
+          <span class="yellow"></span>
+          <span class="green"></span>
+        </div>
+        <div class="titlebar-title">
+          <span>System Settings</span>
+          <small>OpenClaw Control Center</small>
+        </div>
+        <div class="titlebar-actions">
+          <div class="pill">macOS Sonoma · Live</div>
+        </div>
+      </header>
+      <div class="toolbar">
+        <div class="search">
+          🔍
+          <input type="text" value="Search OpenClaw" readonly />
+        </div>
+        <div class="segmented" aria-label="View mode">
+          <button class="active" type="button">Overview</button>
+          <button type="button">Details</button>
+          <button type="button">History</button>
+        </div>
+        <div class="pill">Auto-refresh · On</div>
+      </div>
 
-<button onclick="send('status')">Status</button>
-<button onclick="send('restart')">Restart</button>
-<button onclick="send('sendlog')">Send Log</button>
+      <div class="content">
+        <aside class="sidebar">
+          <div class="app-badge">
+            <div class="app-icon">OC</div>
+            <div class="app-meta">
+              <h2>OpenClaw</h2>
+              <p>Connected · 2 devices</p>
+            </div>
+          </div>
 
-<script>
-const tg = window.Telegram.WebApp;
-tg.expand();
+          <div class="nav-group">
+            <h3>Favorites</h3>
+            <button class="active" type="button">
+              Overview
+              <span>Live</span>
+            </button>
+            <button type="button">Automation</button>
+            <button type="button">Diagnostics</button>
+            <button type="button">Security</button>
+          </div>
 
-function send(cmd){
-  tg.sendData(cmd);
-}
-</script>
+          <div class="nav-group">
+            <h3>System</h3>
+            <button type="button">Network</button>
+            <button type="button">Power</button>
+            <button type="button">Logs</button>
+          </div>
+        </aside>
 
+        <main class="main">
+          <div class="hero">
+            <div>
+              <h1>OpenClaw Status</h1>
+              <p>Visualize live telemetry in a macOS Sonoma workspace.</p>
+            </div>
+            <div class="pill">Updated just now</div>
+          </div>
+
+          <div class="overview-grid">
+            <div>
+              <section class="status-row">
+                <div class="card">
+                  <h4>System State</h4>
+                  <p>Operational</p>
+                  <div class="toggle-row">
+                    <span>Remote Access</span>
+                    <div class="toggle on" aria-hidden="true"></div>
+                  </div>
+                </div>
+                <div class="card">
+                  <h4>Battery</h4>
+                  <p>96%</p>
+                  <div class="toggle-row">
+                    <span>Low Power</span>
+                    <div class="toggle" aria-hidden="true"></div>
+                  </div>
+                </div>
+                <div class="card">
+                  <h4>Network</h4>
+                  <p>Secure Link</p>
+                  <div class="toggle-row">
+                    <span>Private Relay</span>
+                    <div class="toggle on" aria-hidden="true"></div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="status-row">
+                <div class="card">
+                  <h4>Last Sync</h4>
+                  <p>2 min ago</p>
+                  <div class="toggle-row">
+                    <span>Auto Sync</span>
+                    <div class="toggle on" aria-hidden="true"></div>
+                  </div>
+                </div>
+                <div class="card">
+                  <h4>Runtime</h4>
+                  <p>12h 48m</p>
+                  <div class="toggle-row">
+                    <span>Thermal Guard</span>
+                    <div class="toggle on" aria-hidden="true"></div>
+                  </div>
+                </div>
+                <div class="card">
+                  <h4>Logs</h4>
+                  <p>All clear</p>
+                  <div class="toggle-row">
+                    <span>Auto Export</span>
+                    <div class="toggle" aria-hidden="true"></div>
+                  </div>
+                </div>
+              </section>
+            </div>
+            <aside class="activity">
+              <h3>Recent Activity</h3>
+              <div class="activity-item">
+                <strong>Diagnostics complete</strong>
+                <span>No alerts in the last 24h.</span>
+              </div>
+              <div class="activity-item">
+                <strong>Scheduler updated</strong>
+                <span>Automation plan refreshed 3 minutes ago.</span>
+              </div>
+              <div class="activity-item">
+                <strong>Telemetry synced</strong>
+                <span>New data points recorded · 08:52 AM.</span>
+              </div>
+            </aside>
+          </div>
+
+          <section class="actions">
+            <button class="primary" type="button" onclick="send('status')">Request Status</button>
+            <button class="secondary" type="button" onclick="send('restart')">Restart Controller</button>
+            <button class="secondary" type="button" onclick="send('sendlog')">Export Logs</button>
+          </section>
+
+          <div class="footer">
+            <span>OpenClaw Live · v3.5.0</span>
+            <span>Last heartbeat 12s ago</span>
+          </div>
+        </main>
+      </div>
+    </section>
+  </div>
+
+  <div class="dock" aria-hidden="true">
+    <div class="dock-icon">⚙️</div>
+    <div class="dock-icon">📡</div>
+    <div class="dock-icon">🛰️</div>
+    <div class="dock-icon">📝</div>
+    <div class="dock-icon">🧭</div>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function send(cmd) {
+      tg.sendData(cmd);
+    }
+  </script>
 </body>
 </html>
