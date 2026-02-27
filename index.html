@@ -8,16 +8,22 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f5f5f7;
-      --window-bg: rgba(255, 255, 255, 0.82);
-      --window-border: rgba(60, 60, 67, 0.18);
-      --shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+      --wallpaper-top: #c8d5ff;
+      --wallpaper-mid: #f6f1ff;
+      --wallpaper-bottom: #e3eefc;
+      --glass: rgba(255, 255, 255, 0.72);
+      --glass-strong: rgba(255, 255, 255, 0.9);
+      --border: rgba(60, 60, 67, 0.16);
+      --shadow: 0 30px 80px rgba(0, 0, 0, 0.24);
       --title: #1d1d1f;
       --subtitle: #6e6e73;
-      --accent: #0a84ff;
-      --accent-soft: rgba(10, 132, 255, 0.12);
-      --chip-bg: rgba(60, 60, 67, 0.08);
-      --separator: rgba(60, 60, 67, 0.12);
+      --accent: #007aff;
+      --accent-soft: rgba(0, 122, 255, 0.14);
+      --success: #34c759;
+      --warning: #ff9f0a;
+      --danger: #ff453a;
+      --dock: rgba(255, 255, 255, 0.6);
+      --menu: rgba(255, 255, 255, 0.6);
     }
 
     * {
@@ -26,29 +32,59 @@
 
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI",
-        sans-serif;
-      background: radial-gradient(circle at top, #ffffff 0%, #f5f5f7 45%, #e5e5ea 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+        "Segoe UI", sans-serif;
       color: var(--title);
+      background: radial-gradient(circle at 20% 0%, var(--wallpaper-top), var(--wallpaper-mid) 45%, var(--wallpaper-bottom) 100%);
       min-height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .menu-bar {
+      height: 36px;
+      display: flex;
       align-items: center;
-      padding: 32px 16px;
+      justify-content: space-between;
+      padding: 0 18px;
+      font-size: 13px;
+      color: #1c1c1e;
+      background: var(--menu);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .menu-left,
+    .menu-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .menu-icon {
+      font-size: 16px;
+      font-weight: 600;
     }
 
     .desktop {
-      width: min(980px, 100%);
-      display: grid;
-      gap: 24px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 18px 96px;
     }
 
     .window {
-      background: var(--window-bg);
-      border: 1px solid var(--window-border);
-      border-radius: 18px;
+      width: min(1120px, 100%);
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 22px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(30px);
       overflow: hidden;
     }
 
@@ -56,9 +92,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--separator);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6));
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.7));
     }
 
     .traffic-lights {
@@ -75,88 +111,144 @@
     }
 
     .traffic-lights .red {
-      background: #ff5f57;
+      background: var(--danger);
     }
 
     .traffic-lights .yellow {
-      background: #febc2e;
+      background: var(--warning);
     }
 
     .traffic-lights .green {
-      background: #28c840;
+      background: var(--success);
     }
 
-    .titlebar .title {
+    .titlebar-title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      text-align: center;
+    }
+
+    .titlebar-title span {
       font-size: 14px;
       font-weight: 600;
       letter-spacing: 0.3px;
     }
 
-    .content {
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      min-height: 420px;
-    }
-
-    .sidebar {
-      padding: 22px 18px;
-      border-right: 1px solid var(--separator);
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .sidebar h3 {
-      margin: 0;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
+    .titlebar-title small {
+      font-size: 11px;
       color: var(--subtitle);
     }
 
-    .nav {
-      display: grid;
-      gap: 10px;
-    }
-
-    .nav button {
+    .titlebar-actions {
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+
+    .pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--subtitle);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 560px;
+    }
+
+    .sidebar {
+      padding: 22px 20px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .app-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .app-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #7aa3ff, #4f6df6);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .app-meta h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .app-meta p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: var(--subtitle);
+    }
+
+    .nav-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav-group h3 {
+      margin: 0;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--subtitle);
+    }
+
+    .nav-group button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       padding: 10px 12px;
       border-radius: 10px;
       border: none;
       background: transparent;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--title);
-      text-align: left;
       cursor: pointer;
     }
 
-    .nav button.active {
+    .nav-group button.active {
       background: var(--accent-soft);
       color: var(--accent);
       font-weight: 600;
     }
 
-    .nav button span {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
+    .nav-group button span {
+      font-size: 11px;
+      color: var(--subtitle);
     }
 
     .main {
-      padding: 28px 30px;
+      padding: 28px 32px 32px;
       display: grid;
       gap: 20px;
     }
 
     .hero {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
+      gap: 16px;
     }
 
     .hero h1 {
@@ -167,46 +259,74 @@
 
     .hero p {
       margin: 6px 0 0;
-      color: var(--subtitle);
       font-size: 14px;
-    }
-
-    .chip {
-      background: var(--chip-bg);
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 12px;
       color: var(--subtitle);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
     }
 
-    .status-grid {
+    .status-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
       gap: 14px;
     }
 
     .card {
+      background: var(--glass-strong);
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 16px;
-      border-radius: 14px;
-      border: 1px solid var(--separator);
-      background: rgba(255, 255, 255, 0.9);
+      display: grid;
+      gap: 10px;
     }
 
     .card h4 {
       margin: 0;
       font-size: 12px;
+      color: var(--subtitle);
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: var(--subtitle);
     }
 
     .card p {
-      margin: 10px 0 0;
+      margin: 0;
       font-size: 18px;
       font-weight: 600;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .toggle {
+      width: 46px;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(120, 120, 128, 0.2);
+      position: relative;
+      transition: background 0.2s ease;
+    }
+
+    .toggle::after {
+      content: "";
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    .toggle.on {
+      background: var(--accent);
+    }
+
+    .toggle.on::after {
+      transform: translateX(20px);
     }
 
     .actions {
@@ -225,16 +345,16 @@
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .actions button.primary {
+    .actions .primary {
       background: var(--accent);
       color: #fff;
-      box-shadow: 0 12px 30px rgba(10, 132, 255, 0.3);
+      box-shadow: 0 12px 30px rgba(0, 122, 255, 0.3);
     }
 
-    .actions button.secondary {
-      background: #ffffff;
+    .actions .secondary {
+      background: #fff;
+      border: 1px solid var(--border);
       color: var(--title);
-      border: 1px solid var(--separator);
     }
 
     .actions button:active {
@@ -242,84 +362,183 @@
     }
 
     .footer {
-      border-top: 1px solid var(--separator);
+      border-top: 1px solid var(--border);
       padding-top: 16px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
       font-size: 12px;
       color: var(--subtitle);
     }
 
-    @media (max-width: 720px) {
+    .dock {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: var(--dock);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 22px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+      z-index: 4;
+    }
+
+    .dock-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: #ffffff;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    @media (max-width: 880px) {
       .content {
         grid-template-columns: 1fr;
       }
 
       .sidebar {
         border-right: none;
-        border-bottom: 1px solid var(--separator);
+        border-bottom: 1px solid var(--border);
       }
 
-      .hero {
-        flex-direction: column;
-        align-items: flex-start;
+      .dock {
+        display: none;
       }
     }
   </style>
 </head>
-
 <body>
+  <div class="menu-bar">
+    <div class="menu-left">
+      <span class="menu-icon"></span>
+      <span>OpenClaw</span>
+      <span>File</span>
+      <span>Edit</span>
+      <span>View</span>
+      <span>Window</span>
+    </div>
+    <div class="menu-right">
+      <span>Wi-Fi</span>
+      <span>Battery</span>
+      <span>9:41 AM</span>
+    </div>
+  </div>
+
   <div class="desktop">
-    <div class="window">
-      <div class="titlebar">
+    <section class="window" aria-label="OpenClaw System Settings">
+      <header class="titlebar">
         <div class="traffic-lights" aria-hidden="true">
           <span class="red"></span>
           <span class="yellow"></span>
           <span class="green"></span>
         </div>
-        <div class="title">OpenClaw Control Center</div>
-        <div class="chip">macOS Sonoma · Live</div>
-      </div>
+        <div class="titlebar-title">
+          <span>System Settings</span>
+          <small>OpenClaw Control Center</small>
+        </div>
+        <div class="titlebar-actions">
+          <div class="pill">macOS Sonoma · Live</div>
+        </div>
+      </header>
+
       <div class="content">
         <aside class="sidebar">
-          <h3>Favorites</h3>
-          <div class="nav">
+          <div class="app-badge">
+            <div class="app-icon">OC</div>
+            <div class="app-meta">
+              <h2>OpenClaw</h2>
+              <p>Connected · 2 devices</p>
+            </div>
+          </div>
+
+          <div class="nav-group">
+            <h3>Favorites</h3>
             <button class="active" type="button">
-              <span></span>
-              Dashboard
+              Overview
+              <span>Live</span>
             </button>
-            <button type="button">Automations</button>
+            <button type="button">Automation</button>
             <button type="button">Diagnostics</button>
+            <button type="button">Security</button>
+          </div>
+
+          <div class="nav-group">
+            <h3>System</h3>
+            <button type="button">Network</button>
+            <button type="button">Power</button>
             <button type="button">Logs</button>
           </div>
-          <div class="chip">Connected · 2 devices</div>
         </aside>
+
         <main class="main">
           <div class="hero">
             <div>
-              <h1>OpenClaw System Overview</h1>
-              <p>Monitor the live rig from a macOS-inspired workspace.</p>
+              <h1>OpenClaw Status</h1>
+              <p>Visualize live telemetry in a macOS Sonoma workspace.</p>
             </div>
-            <div class="chip">Updated just now</div>
+            <div class="pill">Updated just now</div>
           </div>
 
-          <section class="status-grid">
+          <section class="status-row">
             <div class="card">
               <h4>System State</h4>
               <p>Operational</p>
+              <div class="toggle-row">
+                <span>Remote Access</span>
+                <div class="toggle on" aria-hidden="true"></div>
+              </div>
             </div>
             <div class="card">
               <h4>Battery</h4>
               <p>96%</p>
-            </div>
-            <div class="card">
-              <h4>Last Sync</h4>
-              <p>2 min ago</p>
+              <div class="toggle-row">
+                <span>Low Power</span>
+                <div class="toggle" aria-hidden="true"></div>
+              </div>
             </div>
             <div class="card">
               <h4>Network</h4>
               <p>Secure Link</p>
+              <div class="toggle-row">
+                <span>Private Relay</span>
+                <div class="toggle on" aria-hidden="true"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="status-row">
+            <div class="card">
+              <h4>Last Sync</h4>
+              <p>2 min ago</p>
+              <div class="toggle-row">
+                <span>Auto Sync</span>
+                <div class="toggle on" aria-hidden="true"></div>
+              </div>
+            </div>
+            <div class="card">
+              <h4>Runtime</h4>
+              <p>12h 48m</p>
+              <div class="toggle-row">
+                <span>Thermal Guard</span>
+                <div class="toggle on" aria-hidden="true"></div>
+              </div>
+            </div>
+            <div class="card">
+              <h4>Logs</h4>
+              <p>All clear</p>
+              <div class="toggle-row">
+                <span>Auto Export</span>
+                <div class="toggle" aria-hidden="true"></div>
+              </div>
             </div>
           </section>
 
@@ -330,12 +549,20 @@
           </section>
 
           <div class="footer">
-            <span>OpenClaw Live · v3.4.1</span>
-            <span>All systems normal</span>
+            <span>OpenClaw Live · v3.5.0</span>
+            <span>Last heartbeat 12s ago</span>
           </div>
         </main>
       </div>
-    </div>
+    </section>
+  </div>
+
+  <div class="dock" aria-hidden="true">
+    <div class="dock-icon">⚙️</div>
+    <div class="dock-icon">📡</div>
+    <div class="dock-icon">🛰️</div>
+    <div class="dock-icon">📝</div>
+    <div class="dock-icon">🧭</div>
   </div>
 
   <script>
