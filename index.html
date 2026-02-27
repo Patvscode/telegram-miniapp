@@ -97,6 +97,67 @@
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.7));
     }
 
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .toolbar .search {
+      flex: 1;
+      max-width: 320px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 13px;
+      color: var(--subtitle);
+    }
+
+    .toolbar .search input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      width: 100%;
+      color: var(--title);
+    }
+
+    .segmented {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border);
+      padding: 4px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    .segmented button {
+      border: none;
+      background: transparent;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--subtitle);
+    }
+
+    .segmented button.active {
+      background: #fff;
+      color: var(--title);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      font-weight: 600;
+    }
+
     .traffic-lights {
       display: flex;
       gap: 8px;
@@ -269,6 +330,12 @@
       gap: 14px;
     }
 
+    .overview-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
     .card {
       background: var(--glass-strong);
       border: 1px solid var(--border);
@@ -372,6 +439,34 @@
       color: var(--subtitle);
     }
 
+    .activity {
+      display: grid;
+      gap: 12px;
+    }
+
+    .activity h3 {
+      margin: 0;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--subtitle);
+    }
+
+    .activity-item {
+      display: grid;
+      gap: 6px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.85);
+      font-size: 13px;
+    }
+
+    .activity-item strong {
+      font-size: 14px;
+      color: var(--title);
+    }
+
     .dock {
       position: fixed;
       bottom: 18px;
@@ -413,6 +508,10 @@
       .dock {
         display: none;
       }
+
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -449,6 +548,18 @@
           <div class="pill">macOS Sonoma · Live</div>
         </div>
       </header>
+      <div class="toolbar">
+        <div class="search">
+          🔍
+          <input type="text" value="Search OpenClaw" readonly />
+        </div>
+        <div class="segmented" aria-label="View mode">
+          <button class="active" type="button">Overview</button>
+          <button type="button">Details</button>
+          <button type="button">History</button>
+        </div>
+        <div class="pill">Auto-refresh · On</div>
+      </div>
 
       <div class="content">
         <aside class="sidebar">
@@ -488,59 +599,78 @@
             <div class="pill">Updated just now</div>
           </div>
 
-          <section class="status-row">
-            <div class="card">
-              <h4>System State</h4>
-              <p>Operational</p>
-              <div class="toggle-row">
-                <span>Remote Access</span>
-                <div class="toggle on" aria-hidden="true"></div>
-              </div>
-            </div>
-            <div class="card">
-              <h4>Battery</h4>
-              <p>96%</p>
-              <div class="toggle-row">
-                <span>Low Power</span>
-                <div class="toggle" aria-hidden="true"></div>
-              </div>
-            </div>
-            <div class="card">
-              <h4>Network</h4>
-              <p>Secure Link</p>
-              <div class="toggle-row">
-                <span>Private Relay</span>
-                <div class="toggle on" aria-hidden="true"></div>
-              </div>
-            </div>
-          </section>
+          <div class="overview-grid">
+            <div>
+              <section class="status-row">
+                <div class="card">
+                  <h4>System State</h4>
+                  <p>Operational</p>
+                  <div class="toggle-row">
+                    <span>Remote Access</span>
+                    <div class="toggle on" aria-hidden="true"></div>
+                  </div>
+                </div>
+                <div class="card">
+                  <h4>Battery</h4>
+                  <p>96%</p>
+                  <div class="toggle-row">
+                    <span>Low Power</span>
+                    <div class="toggle" aria-hidden="true"></div>
+                  </div>
+                </div>
+                <div class="card">
+                  <h4>Network</h4>
+                  <p>Secure Link</p>
+                  <div class="toggle-row">
+                    <span>Private Relay</span>
+                    <div class="toggle on" aria-hidden="true"></div>
+                  </div>
+                </div>
+              </section>
 
-          <section class="status-row">
-            <div class="card">
-              <h4>Last Sync</h4>
-              <p>2 min ago</p>
-              <div class="toggle-row">
-                <span>Auto Sync</span>
-                <div class="toggle on" aria-hidden="true"></div>
-              </div>
+              <section class="status-row">
+                <div class="card">
+                  <h4>Last Sync</h4>
+                  <p>2 min ago</p>
+                  <div class="toggle-row">
+                    <span>Auto Sync</span>
+                    <div class="toggle on" aria-hidden="true"></div>
+                  </div>
+                </div>
+                <div class="card">
+                  <h4>Runtime</h4>
+                  <p>12h 48m</p>
+                  <div class="toggle-row">
+                    <span>Thermal Guard</span>
+                    <div class="toggle on" aria-hidden="true"></div>
+                  </div>
+                </div>
+                <div class="card">
+                  <h4>Logs</h4>
+                  <p>All clear</p>
+                  <div class="toggle-row">
+                    <span>Auto Export</span>
+                    <div class="toggle" aria-hidden="true"></div>
+                  </div>
+                </div>
+              </section>
             </div>
-            <div class="card">
-              <h4>Runtime</h4>
-              <p>12h 48m</p>
-              <div class="toggle-row">
-                <span>Thermal Guard</span>
-                <div class="toggle on" aria-hidden="true"></div>
+            <aside class="activity">
+              <h3>Recent Activity</h3>
+              <div class="activity-item">
+                <strong>Diagnostics complete</strong>
+                <span>No alerts in the last 24h.</span>
               </div>
-            </div>
-            <div class="card">
-              <h4>Logs</h4>
-              <p>All clear</p>
-              <div class="toggle-row">
-                <span>Auto Export</span>
-                <div class="toggle" aria-hidden="true"></div>
+              <div class="activity-item">
+                <strong>Scheduler updated</strong>
+                <span>Automation plan refreshed 3 minutes ago.</span>
               </div>
-            </div>
-          </section>
+              <div class="activity-item">
+                <strong>Telemetry synced</strong>
+                <span>New data points recorded · 08:52 AM.</span>
+              </div>
+            </aside>
+          </div>
 
           <section class="actions">
             <button class="primary" type="button" onclick="send('status')">Request Status</button>
